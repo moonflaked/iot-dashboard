@@ -5,3 +5,4 @@ venv/
 # Ignore the __pycache__ folder because it is not necessary for running the project
 # The interpreter creates it automatically
 __pycache__/
+*.iml
