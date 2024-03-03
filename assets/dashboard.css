@@ -1,0 +1,19 @@
+#light-button {
+    border-radius: 0;
+    margin-right: 1em;
+    vertical-align: top;
+}
+
+#light-icon {
+    width: 20vh;
+    height: 20vh;
+    display: inline-block;
+}
+
+.background-color-red {
+    background-color: red;
+}
+
+.background-color-green {
+    background-color: green;
+}
