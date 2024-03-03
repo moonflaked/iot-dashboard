@@ -1,5 +1,5 @@
 from dash import Dash, dcc, html, Input, Output, State, callback, ctx
-import light_switch
+import light_switch as light
 dashboard_external_stylesheets = [
     'dashboard.css'
 ]
@@ -12,17 +12,21 @@ app.layout = html.Div([
         className="background-color-red"
     )
 ])
+
+
+
 @callback(
     Output(component_id="light-icon", component_property="className"),
     Input(component_id="light-button", component_property="n_clicks")
-)
+)    
 def change_light_state(n_clicks):
     # Sets the light status state to 0 or 1 indicating whether light is open or closed
-    light_state = n_clicks % 2
+    led_state = n_clicks % 2
+    light.switch_state(led_state)
 
-    if light_state == 0:
-        return "background-color-red"
-    else:
+    if led_state:
         return "background-color-green"
+    else:
+        return "background-color-red"
 if __name__ == '__main__':
     app.run(debug=True)
