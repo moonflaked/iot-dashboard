@@ -2,12 +2,19 @@
     border-radius: 0;
     margin-right: 1em;
     vertical-align: top;
+    background-color: transparent;
+    border-color: transparent;
+    
+}
+
+#light-button:hover {
+    cursor: pointer;
 }
 
 #light-icon {
-    width: 20vh;
-    height: 20vh;
     display: inline-block;
+    max-height: min-content;
+    max-width: min-content;
 }
 
 .background-color-red {
@@ -16,4 +23,9 @@
 
 .background-color-green {
     background-color: green;
+}
+
+.image-icon {
+    max-height: 64px;
+    max-width: 64px;
 }
