@@ -27,3 +27,9 @@
     max-height: 64px;
     max-width: 64px;
 }
+.displayInlineBlock {
+    display: inline-block;
+}
+.verticalAlignTop {
+    vertical-align: top;
+}
