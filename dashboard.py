@@ -1,12 +1,13 @@
 from dash import Dash, html, Input, Output, callback, dcc
 import light_switch as light
 import dash_daq as daq
-import random
+import DHT11 as dht11
 
 dashboard_external_stylesheets = [
     'dashboard.css'
 ]
 app = Dash(__name__, external_stylesheets=dashboard_external_stylesheets)
+
 
 temperature_read_interval = dcc.Interval(
     id="temperature-read-interval",
@@ -116,7 +117,8 @@ def change_light_state(n_clicks):
     Input(component_id="temperature-read-interval", component_property="n_intervals")
 )
 def get_temperature(_):
-    return random.randint(0, 50)
+    sensor = dht11.DHT11(pin=11)
+    return sensor.read_temperature()
 
 
 @callback(
@@ -124,7 +126,8 @@ def get_temperature(_):
     Input(component_id="humidity-read-interval", component_property="n_intervals")
 )
 def get_humidity(_):
-    return random.randint(20, 80)
+     sensor = dht11.DHT11(pin=11)
+     return sensor.read_humidity
 
 
 if __name__ == '__main__':
