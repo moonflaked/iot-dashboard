@@ -1,7 +1,12 @@
+
 from dash import Dash, html, Input, Output, callback, dcc
 import light_switch as light
 import dash_daq as daq
 import DHT11 as dht11
+
+
+
+
 
 dashboard_external_stylesheets = [
     'dashboard.css'
@@ -117,8 +122,9 @@ def change_light_state(n_clicks):
     Input(component_id="temperature-read-interval", component_property="n_intervals")
 )
 def get_temperature(_):
-    sensor = dht11.DHT11(pin=11)
-    return sensor.read_temperature()
+    sensor = dht11.DHT11(pin=11)#the pin11 is in the physicl this means that in the GPIO is the 17
+    temperature = sensor.read_temperature()
+    return temperature
 
 
 @callback(
@@ -126,8 +132,9 @@ def get_temperature(_):
     Input(component_id="humidity-read-interval", component_property="n_intervals")
 )
 def get_humidity(_):
-     sensor = dht11.DHT11(pin=11)
-     return sensor.read_humidity
+     sensor = dht11.DHT11(pin=11) #the pin11 is in the physicl this means that in the GPIO is the 17
+     humidity = sensor.read_humidity()  # Call the method to get humidity
+     return humidity
 
 
 if __name__ == '__main__':
