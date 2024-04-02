@@ -8,6 +8,7 @@
 import RPi.GPIO as GPIO
 import time
 
+
 class DHT(object):
 	DHTLIB_OK = 0
 	DHTLIB_ERROR_CHECKSUM = -1
@@ -24,6 +25,7 @@ class DHT(object):
 		self.pin = pin
 		self.bits = [0,0,0,0,0]
 		GPIO.setmode(GPIO.BOARD)
+		
 	#Read DHT sensor, store the original data in bits[]	
 	def readSensor(self,pin,wakeupDelay):
 		mask = 0x80
