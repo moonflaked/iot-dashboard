@@ -154,7 +154,7 @@ def get_temperature(_):
 )
 def check_temperature(sensor_temperature):
     
-    if(sensor_temperature > 22):
+    if(sensor_temperature > 24):
             
         sender_email = 'loganluo288@gmail.com'
         sender_password = 'criz nbpq zyrz ahjw'
@@ -178,7 +178,7 @@ def check_temperature(sensor_temperature):
                 email_module.response_received = True
                 email_module.yes_response_received = False
                 email_module.email_sent = False
-    elif(sensor_temperature <= 22 and email_module.email_sent == True):
+    elif(sensor_temperature <= 24 and email_module.email_sent == True):
         if("yes" in message_response.lower() and email_module.response_received == False):
             motor.turn_on()
             email_module.response_received = True
