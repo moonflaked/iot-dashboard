@@ -160,7 +160,7 @@ def check_temperature(sensor_temperature):
         sender_password = 'criz nbpq zyrz ahjw'
         receiver_email = "vladtivig@gmail.com"
         receiver_password = "lkxc dvpr mrfb mroy"
-        temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Woul dyou like to turn on the fan?"
+        temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Would you like to turn on the fan?"
         email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
         
         email_module.email_sent = True
