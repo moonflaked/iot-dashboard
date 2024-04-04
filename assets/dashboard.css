@@ -33,3 +33,8 @@
 .verticalAlignTop {
     vertical-align: top;
 }
+
+#fan-icon-image {
+    max-height: 128px;
+    
+}

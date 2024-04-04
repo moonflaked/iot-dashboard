@@ -1,13 +1,14 @@
 
 from dash import Dash, html, Input, Output, callback, dcc
+import RPi.GPIO as GPIO
 import light_switch as light
 import dash_daq as daq
-import DHT11 as dht11
+import Freenove_DHT as DHT
+import email_send_receive as email_module
+import Motor as motor
+import time
 
-
-
-
-
+motor.turn_off()
 dashboard_external_stylesheets = [
     'dashboard.css'
 ]
@@ -43,6 +44,8 @@ humidity_read_interval = dcc.Interval(
     n_intervals=0
 )
 
+
+
 humidity_gauge = daq.Gauge(
     id="humidity-gauge",
     min=20,
@@ -63,6 +66,7 @@ humidity_gauge = daq.Gauge(
     showCurrentValue=True,
     units="%",
 )
+
 
 app.layout = html.Div([
     html.Div(
@@ -86,7 +90,7 @@ app.layout = html.Div([
         ]
     ),
     html.Div(
-        className="displayInlineBlock",
+        className="displayInlineBlock verticalAlignTop",
         children=[
             temperature_gauge,
             humidity_gauge,
@@ -94,6 +98,19 @@ app.layout = html.Div([
             humidity_read_interval
         ]
     ),
+    html.Div(
+        className="displayInlineBlock",
+        children=[
+            html.Div(
+                children=[
+                    html.Img(
+                        src="assets/fan.png",
+                        id="fan-icon-image"
+                    )
+                ]
+            )
+        ]
+    )
 ])
 
 
@@ -116,25 +133,84 @@ def change_light_state(n_clicks):
     else:
         return "assets/off-button.png", "assets/closed-light.png"
 
-
 @callback(
     Output(component_id="temperature-gauge", component_property="value"),
     Input(component_id="temperature-read-interval", component_property="n_intervals")
 )
 def get_temperature(_):
-    sensor = dht11.DHT11(pin=11)#the pin11 is in the physicl this means that in the GPIO is the 17
-    temperature = sensor.read_temperature()
-    return temperature
+    sensor = DHT.DHT(pin=12)#the pin12 is in the physicl this means that in the GPIO is the 18
+    chk = sensor.readDHT11()
+    if(chk is sensor.DHTLIB_OK):
+        return sensor.temperature
+    
+        
+    else:
+        motor.turn_off()
+        return sensor.temperature, "assets/fan.png"
 
+@callback(
+    Output(component_id="fan-icon-image", component_property="src"),
+    Input(component_id="temperature-gauge", component_property="value")
+)
+def check_temperature(sensor_temperature):
+    
+    if(sensor_temperature > 22):
+            
+        sender_email = 'loganluo288@gmail.com'
+        sender_password = 'criz nbpq zyrz ahjw'
+        receiver_email = "yamanmh2002@gmail.com"
+        receiver_password = "lkxc dvpr mrfb mroy"
+        temperature_exceeded_message = "The temperature has exceeded 24 degrees Celsius. Would you like to turn on the fan? (reply with yes or no)"
+        email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
+        
+        email_module.email_sent = True
+        message_response = email_module.receive_email(sender_email, sender_password)
+        if(email_module.email_sent):
+            if("yes" in message_response.lower() and email_module.response_received == False):
+                motor.turn_on()
+                print("TURNED ON")
+                email_module.response_received = True
+                email_module.yes_response_received = True
+                email_module.email_sent = False
+                return "assets/fan-spin.png"
+            elif("yes" not in message_response.lower() and email_module.response_received == False):
+                motor.turn_off()
+                email_module.response_received = True
+                email_module.yes_response_received = False
+                email_module.email_sent = False
+    elif(sensor_temperature <= 22 and email_module.email_sent == True):
+        if("yes" in message_response.lower() and email_module.response_received == False):
+            motor.turn_on()
+            email_module.response_received = True
+            email_module.yes_response_received = True
+            email_module.email_sent = False
+            return "assets/fan-spin.png"
+        elif("yes" not in message_response.lower() and email_module.response_received == False):
+            motor.turn_off()
+            email_module.response_received = True
+            email_module.yes_response_received = False
+            email_module.email_sent = False               
+    elif(email_module.response_received == True and email_module.yes_response_received == False):
+        motor.turn_off()
+        email_module.response_received = False
+        return "assets/fan.png"
+    elif(email_module.response_received == True and email_module.yes_response_received == True):
+        motor.turn_on()
+        return "assets/fan-spin.png"
+    else:
+        motor.turn_off()
+        return "assets/fan.png"
 
 @callback(
     Output(component_id="humidity-gauge", component_property="value"),
     Input(component_id="humidity-read-interval", component_property="n_intervals")
 )
 def get_humidity(_):
-     sensor = dht11.DHT11(pin=11) #the pin11 is in the physicl this means that in the GPIO is the 17
-     humidity = sensor.read_humidity()  # Call the method to get humidity
-     return humidity
+    sensor = DHT.DHT(pin=12)#the pin12 is in the physicl this means that in the GPIO is the 18
+    chk = sensor.readDHT11()
+    if(chk is sensor.DHTLIB_OK):
+        humidity = sensor.humidity  # Call the method to get humidity
+        return humidity
 
 
 if __name__ == '__main__':

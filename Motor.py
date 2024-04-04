@@ -1,28 +1,39 @@
 import RPi.GPIO as GPIO
-from time import sleep
+import time
+Motor1 = 15  # Enable Pin, GPIO 22
+Motor2 = 13  # Input Pin, GPIO 27
+Motor3 = 22  # Input Pin, GPIO 25
 
-Motor1 = 22  # Enable Pin
-Motor2 = 27  # Input Pin
-Motor3 = 17  # Input Pin
-
-GPIO.setmode(GPIO.BCM)
+GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
+
+# GPIO.setup(Motor1,GPIO.OUT)
+# GPIO.setup(Motor2,GPIO.OUT)
+# GPIO.setup(Motor3,GPIO.OUT)
+
+# GPIO.output(Motor1,GPIO.HIGH)
+# GPIO.output(Motor2,GPIO.LOW)
+# GPIO.output(Motor3,GPIO.HIGH)
+# time.sleep(5)
+
+# GPIO.output(Motor1,GPIO.HIGH)
+# GPIO.output(Motor2,GPIO.HIGH)
+# GPIO.output(Motor3,GPIO.LOW)
+
+# time.sleep(5)
+# GPIO.output(Motor1,GPIO.LOW)
+# GPIO.cleanup()
+# GPIO.setmode(GPIO.BOARD)
+# GPIO.setwarnings(False)
 
 GPIO.setup(Motor1, GPIO.OUT)
 GPIO.setup(Motor2, GPIO.OUT)
 GPIO.setup(Motor3, GPIO.OUT)
+def turn_on():
+    GPIO.output(Motor2, GPIO.HIGH)
+    GPIO.output(Motor1, GPIO.HIGH)
+    GPIO.output(Motor3, GPIO.LOW)
+def turn_off():
+    GPIO.output(Motor1, GPIO.LOW)
 
-try:
-    GPIO.output(Motor1, GPIO.HIGH)  
-    GPIO.output(Motor2, GPIO.LOW)   
-    GPIO.output(Motor3, GPIO.HIGH)  
-    sleep(5)
-
-    GPIO.output(Motor1, GPIO.HIGH)  
-    GPIO.output(Motor2, GPIO.HIGH)  
-    GPIO.output(Motor3, GPIO.LOW)   
-    sleep(5)
-
-finally:
-    GPIO.output(Motor1, GPIO.LOW)  
-    GPIO.cleanup()  
+# turn_on()

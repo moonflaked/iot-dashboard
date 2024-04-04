@@ -32,6 +32,7 @@ class DHT(object):
 		idx = 0
 		self.bits = [0,0,0,0,0]
 		# Clear sda
+		GPIO.setwarnings(False)
 		GPIO.setup(pin,GPIO.OUT)
 		GPIO.output(pin,GPIO.HIGH)
 		time.sleep(0.5)
@@ -39,7 +40,7 @@ class DHT(object):
 		GPIO.output(pin,GPIO.LOW)
 		time.sleep(wakeupDelay)
 		GPIO.output(pin,GPIO.HIGH)
-		# time.sleep(0.000001)
+		#time.sleep(0.000001)
 		GPIO.setup(pin,GPIO.IN)
 		
 		loopCnt = self.DHTLIB_TIMEOUT
@@ -108,18 +109,19 @@ class DHT(object):
 		
 		
 def loop():
-	dht = DHT(11)
-	sumCnt = 0
-	okCnt = 0
+	dht = DHT(12)
+	counts = 0 # Measurement counts
 	while(True):
-		sumCnt += 1
-		chk = dht.readDHT11()	
-		if (chk is 0):
-			okCnt += 1		
-		okRate = 100.0*okCnt/sumCnt;
-		print("sumCnt : %d, \t okRate : %.2f%% "%(sumCnt,okRate))
-		print("chk : %d, \t Humidity : %.2f, \t Temperature : %.2f "%(chk,dht.humidity,dht.temperature))
-		time.sleep(3)		
+		counts += 1
+		print("Measurement counts: ", counts)
+		for i in range(0,15):
+			chk = dht.readDHT11() #read DHT11 and get a return value. Then determine whether data read is normal according to the return value.
+			if (chk is dht.DHTLIB_OK): #read DHT11 and get a return value. Then determine whether data read is normal according to the return value.
+				print("DHT11,OK!")
+				break
+		time.sleep(0.1)
+		print("Humidity : %.2f, \t Temperature : %.2f \n"%(dht.humidity,dht.temperature))
+		time.sleep(2) 
 		
 if __name__ == '__main__':
 	print ('Program is starting ... ')
