@@ -11,7 +11,7 @@ yes_response_received = False
 
 def send_email(email, password, text, sender_email, receiver_email):
     
-    if not email_sent:
+    if email_sent == False: 
         
         server = smtplib.SMTP("smtp.gmail.com", 587)
         print("after smtp function")
@@ -21,6 +21,7 @@ def send_email(email, password, text, sender_email, receiver_email):
         
         server.sendmail(sender_email, receiver_email, text)
         server.quit()
+        
 
 def receive_email(email_address, password, subject=None):
     imap = imaplib.IMAP4_SSL("imap.gmail.com")
@@ -30,8 +31,8 @@ def receive_email(email_address, password, subject=None):
     # Search for unseen emails in the inbox using the specified criteria
     # .search returns two tuples, including status code and the message IDs separated by spaces
     typ, data = imap.search(None, "UNSEEN")
-    
-    
+    if(not data[0]):
+        return
     latest_message_id = data[0].split()[-1]
     # Fetch the content of the latest message received using the message ID's from .search
     typ, data = imap.fetch(latest_message_id, "(RFC822)")
@@ -56,5 +57,4 @@ def receive_email(email_address, password, subject=None):
     imap.close()
     imap.logout()
     return payload
-
     

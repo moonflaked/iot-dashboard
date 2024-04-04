@@ -40,7 +40,7 @@ temperature_gauge = daq.Gauge(
 
 humidity_read_interval = dcc.Interval(
     id="humidity-read-interval",
-    interval=2000,
+    interval=15000,
     n_intervals=0
 )
 
@@ -142,61 +142,69 @@ def get_temperature(_):
     chk = sensor.readDHT11()
     if(chk is sensor.DHTLIB_OK):
         return sensor.temperature
-    
-        
-    else:
-        motor.turn_off()
-        return sensor.temperature, "assets/fan.png"
 
 @callback(
     Output(component_id="fan-icon-image", component_property="src"),
     Input(component_id="temperature-gauge", component_property="value")
 )
 def check_temperature(sensor_temperature):
-    
-    if(sensor_temperature > 22):
-            
-        sender_email = 'loganluo288@gmail.com'
-        sender_password = 'criz nbpq zyrz ahjw'
-        receiver_email = "yamanmh2002@gmail.com"
-        receiver_password = "lkxc dvpr mrfb mroy"
-        temperature_exceeded_message = "The temperature has exceeded 24 degrees Celsius. Would you like to turn on the fan? (reply with yes or no)"
-        email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
-        
-        email_module.email_sent = True
-        message_response = email_module.receive_email(sender_email, sender_password)
-        if(email_module.email_sent):
-            if("yes" in message_response.lower() and email_module.response_received == False):
-                motor.turn_on()
-                print("TURNED ON")
-                email_module.response_received = True
-                email_module.yes_response_received = True
-                email_module.email_sent = False
-                return "assets/fan-spin.png"
-            elif("yes" not in message_response.lower() and email_module.response_received == False):
-                motor.turn_off()
-                email_module.response_received = True
-                email_module.yes_response_received = False
-                email_module.email_sent = False
-    elif(sensor_temperature <= 22 and email_module.email_sent == True):
-        if("yes" in message_response.lower() and email_module.response_received == False):
-            motor.turn_on()
-            email_module.response_received = True
-            email_module.yes_response_received = True
-            email_module.email_sent = False
-            return "assets/fan-spin.png"
-        elif("yes" not in message_response.lower() and email_module.response_received == False):
-            motor.turn_off()
-            email_module.response_received = True
-            email_module.yes_response_received = False
-            email_module.email_sent = False               
-    elif(email_module.response_received == True and email_module.yes_response_received == False):
+    if(email_module.response_received == True and email_module.yes_response_received == False):
         motor.turn_off()
         email_module.response_received = False
         return "assets/fan.png"
     elif(email_module.response_received == True and email_module.yes_response_received == True):
         motor.turn_on()
         return "assets/fan-spin.png"
+    elif(sensor_temperature > 24):  
+        sender_email = 'loganluo288@gmail.com'
+        sender_password = 'criz nbpq zyrz ahjw'
+        receiver_email = "vladtivig@gmail.com"
+        receiver_password = "lkxc dvpr mrfb mroy"
+        temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Woul dyou like to turn on the fan?"
+        email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
+        
+        email_module.email_sent = True
+        message_response = email_module.receive_email(sender_email, sender_password)
+        if(email_module.email_sent and message_response != None):
+            print(message_response)
+            if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
+                motor.turn_on()
+                print("TURNED ON")
+                email_module.response_received = True
+                email_module.yes_response_received = True
+                email_module.email_sent = False
+                return "assets/fan-spin.png"
+            elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+                motor.turn_off()
+                email_module.response_received = True
+                email_module.yes_response_received = False
+                email_module.email_sent = False
+                return "assets/fan.png"
+        else:
+            motor.turn_off()
+            return "assets/fan.png"
+    elif(sensor_temperature <= 24 and email_module.email_sent == True):
+        sender_email = 'loganluo288@gmail.com'
+        sender_password = 'criz nbpq zyrz ahjw'
+        receiver_email = "vladtivig@gmail.com"
+        message_response = email_module.receive_email(sender_email, sender_password)
+        if(message_response != None):
+            print(message_response)
+            if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
+                motor.turn_on()
+                email_module.response_received = True
+                email_module.yes_response_received = True
+                email_module.email_sent = False
+                return "assets/fan-spin.png"
+            elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+                motor.turn_off()
+                email_module.response_received = True
+                email_module.yes_response_received = False
+                email_module.email_sent = False
+                return "assets/fan.png"
+        else:
+            motor.turn_off()
+            return "assets/fan.png"
     else:
         motor.turn_off()
         return "assets/fan.png"
