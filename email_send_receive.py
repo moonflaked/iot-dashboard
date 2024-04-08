@@ -14,7 +14,6 @@ def send_email(email, password, text, sender_email, receiver_email):
     if email_sent == False: 
         
         server = smtplib.SMTP("smtp.gmail.com", 587)
-        print("after smtp function")
         server.starttls()
         
         server.login(email, password)

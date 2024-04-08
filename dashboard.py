@@ -166,10 +166,8 @@ def check_temperature(sensor_temperature):
         email_module.email_sent = True
         message_response = email_module.receive_email(sender_email, sender_password)
         if(email_module.email_sent and message_response != None):
-            print(message_response)
             if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
                 motor.turn_on()
-                print("TURNED ON")
                 email_module.response_received = True
                 email_module.yes_response_received = True
                 email_module.email_sent = False
@@ -189,7 +187,6 @@ def check_temperature(sensor_temperature):
         receiver_email = "vladtivig@gmail.com"
         message_response = email_module.receive_email(sender_email, sender_password)
         if(message_response != None):
-            print(message_response)
             if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
                 motor.turn_on()
                 email_module.response_received = True
