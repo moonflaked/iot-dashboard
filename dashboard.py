@@ -6,7 +6,6 @@ import dash_daq as daq
 import Freenove_DHT as DHT
 import email_send_receive as email_module
 import Motor as motor
-import time
 
 motor.turn_off()
 dashboard_external_stylesheets = [
