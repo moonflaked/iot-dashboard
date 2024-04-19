@@ -6,7 +6,7 @@ def get_db_connection(db_file_name):
     return conn
 
 def execute_query(db_connection, query):
-    with closing(get_db_connection("dashboard.db")) as connection:
+    with closing(db_connection) as connection:
         with closing(connection.cursor) as cursor:
             cursor.execute(query)
 
