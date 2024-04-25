@@ -1,5 +1,5 @@
-
 from dash import Dash, html, Input, Output, callback, dcc
+from dash.exceptions import PreventUpdate
 import RPi.GPIO as GPIO
 import light_switch as light
 import dash_daq as daq
@@ -7,6 +7,8 @@ import Freenove_DHT as DHT
 import email_send_receive as email_module
 import Motor as motor
 import dash_bootstrap_components as dbc
+import paho.mqtt.client as mqtt
+import mqtt_light_intensity as mli
 motor.turn_off()
 
 app = Dash(__name__,
@@ -114,10 +116,10 @@ light_intensity_card = dbc.Card(
                                         html.Img(
                                             src="assets/sun-icon.png",
                                         ),
-                                        dbc.Progress(value=300, 
+                                        dbc.Progress(value=0, 
                                                         max=1024, 
                                                         style={"minHeight": "30px", "maxWidth": "80%", "fontSize": "2rem"},
-                                                        label="300",
+                                                        label="0",
                                                         id="light-intensity-bar",
                                                     className="intensity-bar")
                                     ],
@@ -205,6 +207,12 @@ humidity_read_interval = dcc.Interval(
 temperature_read_interval = dcc.Interval(
     id="temperature-read-interval",
     interval=2000,
+    n_intervals=0
+)
+
+mqtt_sub_interval = dcc.Interval(
+    id="mqtt-sub-interval",
+    interval=5000,
     n_intervals=0
 )
 
@@ -305,7 +313,8 @@ app.layout = dbc.Container(
         ),
         email_sent_toast,
         temperature_read_interval,
-        humidity_read_interval
+        humidity_read_interval,
+        mqtt_sub_interval
     ],
     className="g-0",
     fluid=True
@@ -415,6 +424,26 @@ def get_humidity(_):
         humidity = sensor.humidity  # Call the method to get humidity
         return humidity
 
+@callback(
+    [
+        Output(component_id="light-intensity-bar", component_property="value"),
+        Output(component_id="light-intensity-bar", component_property="label"),
+        Input(component_id="mqtt-sub-interval", component_property="n_intervals")
+    ]
+)
+def update_light_intensity(_):
+    if(mli.curr_light_intensity == None):
+        # Do not update the light intensity bar if the light intensity does not exist
+        # Because we only want to updte when there is data
+        raise PreventUpdate
+    else:
+        return int(mli.curr_light_intensity), mli.curr_light_intensity
+
+
 
 if __name__ == '__main__':
+    
     app.run(debug=True)
+    
+    
+    
