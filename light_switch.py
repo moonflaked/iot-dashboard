@@ -8,3 +8,8 @@ GPIO.output(led_output_pin, GPIO.LOW)
 def switch_state(led_state):
     GPIO.output(led_output_pin, led_state)
     return led_state
+
+def turn_on():
+    GPIO.output(led_output_pin, GPIO.HIGH)
+def turn_off():
+    GPIO.output(led_output_pin, GPIO.LOW)

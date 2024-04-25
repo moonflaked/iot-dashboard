@@ -1,4 +1,4 @@
-from dash import Dash, html, Input, Output, callback, dcc
+from dash import Dash, html, Input, Output, callback, dcc, no_update
 from dash.exceptions import PreventUpdate
 import RPi.GPIO as GPIO
 import light_switch as light
@@ -9,6 +9,7 @@ import Motor as motor
 import dash_bootstrap_components as dbc
 import paho.mqtt.client as mqtt
 import mqtt_light_intensity as mli
+from datetime import datetime
 motor.turn_off()
 
 app = Dash(__name__,
@@ -190,7 +191,7 @@ email_sent_toast = dbc.Toast(
                         "An email has been sent!",
                         id="positioned-toast",
                         header="Light Intensity Threshold Reached",
-                        is_open=True,
+                        is_open=False,
                         dismissable=True,
                         icon="info",
                         duration=4000,
@@ -428,6 +429,8 @@ def get_humidity(_):
     [
         Output(component_id="light-intensity-bar", component_property="value"),
         Output(component_id="light-intensity-bar", component_property="label"),
+        Output(component_id="light-icon-image", component_property="src"),                                           
+        Output(component_id="positioned-toast", component_property="is_open"),
         Input(component_id="mqtt-sub-interval", component_property="n_intervals")
     ]
 )
@@ -437,12 +440,26 @@ def update_light_intensity(_):
         # Because we only want to updte when there is data
         raise PreventUpdate
     else:
-        return int(mli.curr_light_intensity), mli.curr_light_intensity
+        if(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == False):
+            sender_email = 'loganluo288@gmail.com'
+            sender_password = 'criz nbpq zyrz ahjw'
+            receiver_email = "vladtivig@gmail.com"
+            receiver_password = "lkxc dvpr mrfb mroy"
+            current_time = datetime.now().strftime("%H:%M:%S")
+            #random_int = 48328492389
+            text = f"The Light is ON at {current_time}."
+            email_module.send_email(sender_email, sender_password, text, sender_email, receiver_email, email_module.EmailSentSelect.INTENSITY_EMAIL_SEND)
+            email_module.email_sent_intensity = True
+            light.turn_on()
+            return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", True
+        elif(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == True):
+            return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", no_update
+        return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
+
 
 
 
 if __name__ == '__main__':
-    
     app.run(debug=True)
     
     

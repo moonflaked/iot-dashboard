@@ -4,21 +4,36 @@ import email
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import time
-
+from enum import Enum, auto
 email_sent = False
+email_sent_intensity = False
 response_received = False
 yes_response_received = False
 
-def send_email(email, password, text, sender_email, receiver_email):
-    
-    if email_sent == False: 
-        
+
+class EmailSentSelect(Enum):
+    FAN_EMAIL_SEND = auto(),
+    INTENSITY_EMAIL_SEND = auto()
+
+def send_email(email, password, text, sender_email, receiver_email, email_sent_type=EmailSentSelect.FAN_EMAIL_SEND):
+    global email_sent
+    global email_sent_intensity
+    if(email_sent_type == EmailSentSelect.FAN_EMAIL_SEND and email_sent == False):
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         
         server.login(email, password)
         
-        server.sendmail(sender_email, receiver_email, text)
+        server.sendmail(sender_email, receiver_email, msg=text)
+        server.quit()
+    elif(email_sent_type == EmailSentSelect.INTENSITY_EMAIL_SEND and email_sent_intensity == False): 
+        
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        
+        server.login(email, password)
+        server.sendmail(sender_email, receiver_email, msg=text)
+        print(text)
         server.quit()
         
 
