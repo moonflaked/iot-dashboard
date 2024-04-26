@@ -446,8 +446,8 @@ def update_light_intensity(_):
             receiver_email = "vladtivig@gmail.com"
             receiver_password = "lkxc dvpr mrfb mroy"
             current_time = datetime.now().strftime("%H:%M:%S")
-            #random_int = 48328492389
-            text = f"The Light is ON at {current_time}."
+            
+            text = f"\nThe Light is ON at {current_time}."
             email_module.send_email(sender_email, sender_password, text, sender_email, receiver_email, email_module.EmailSentSelect.INTENSITY_EMAIL_SEND)
             email_module.email_sent_intensity = True
             light.turn_on()

@@ -5,6 +5,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import time
 from enum import Enum, auto
+from datetime import datetime
 email_sent = False
 email_sent_intensity = False
 response_received = False
