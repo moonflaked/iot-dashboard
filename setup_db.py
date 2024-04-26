@@ -28,3 +28,19 @@ execute_query(
         );
     '''
 )
+
+def insert_user(conn, user_id, name):
+    query = f"INSERT INTO USER (USER_ID, NAME) VALUES ({user_id}, '{name}')"
+    execute_query(conn, query)
+
+def insert_threshold(conn, threshold_id, max_temperature, max_humidity, max_light_intensity, user_id):
+    query = f"INSERT INTO THRESHOLD (THRESHOLD_ID, MAX_TEMPERATURE_THRESHOLD, MAX_HUMIDITY_THRESHOLD, MAX_LIGHT_INTENSITY_THRESHOLD, USER_ID) VALUES ({threshold_id}, {max_temperature}, {max_humidity}, {max_light_intensity}, {user_id})"
+    execute_query(conn, query)
+
+def delete_user(conn, user_id):
+    query = f"DELETE FROM USER WHERE USER_ID = {user_id}"
+    execute_query(conn, query)
+
+def delete_threshold(conn, threshold_id):
+    query = f"DELETE FROM THRESHOLD WHERE THRESHOLD_ID = {threshold_id}"
+    execute_query(conn, query)
