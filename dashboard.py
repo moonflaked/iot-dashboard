@@ -268,11 +268,13 @@ temperature_read_interval = dcc.Interval(
     n_intervals=0
 )
 
+
 mqtt_sub_interval = dcc.Interval(
     id="mqtt-sub-interval",
     interval=5000,
     n_intervals=0
 )
+
 
 app.layout = dbc.Container(
     [

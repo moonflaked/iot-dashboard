@@ -5,32 +5,20 @@ def get_db_connection(db_file_name):
     conn = sqlite3.connect(db_file_name)
     return conn
 
-def execute_query(db_connection, query):
-    with closing(db_connection) as connection:
-        with closing(connection.cursor) as cursor:
-            cursor.execute(query)
+def execute_query(db_name, query):
+    with closing(get_db_connection(db_name)) as connection, closing(connection.cursor()) as cursor:
+        cursor.execute(query)
+        connection.commit()
+        return cursor.fetchall()
 
-get_db_connection("dashboard.db")
-execute_query(
-    '''
-        CREATE TABLE USER_THRESHOLD (
-            USER_ID INTEGER PRIMARY KEY AUTOINCREMENT,
-            NAME VARCHAR NOT NULL,
-            THRESHOLD_ID INT NOT NULL,
-            MAX_TEMPERATURE_THRESHOLD DECIMAL NOT NULL,
-            MAX_HUMIDITY_THRESHOLD DECIMAL NOT NULL,
-            MAX_LIGHT_INTENSITY_THRESHOLD INT NOT NULL,
-            RFID_TAG_NUMBER TEXT
-        );
-    '''
-)
 
-def insert_user_threshold(conn, user_id, name, threshold_id, max_temperature, max_humidity, max_light_intensity, rfid_tag_number):
+
+def insert_user_threshold(db_name, name, max_temperature, max_humidity, max_light_intensity, rfid_tag_number):
     query = f"""
-        INSERT INTO USER_THRESHOLD (USER_ID, NAME, THRESHOLD_ID, MAX_TEMPERATURE_THRESHOLD, MAX_HUMIDITY_THRESHOLD, MAX_LIGHT_INTENSITY_THRESHOLD, RFID_TAG_NUMBER) 
-        VALUES ({user_id}, '{name}', {threshold_id}, {max_temperature}, {max_humidity}, {max_light_intensity}, '{rfid_tag_number}')
+        INSERT INTO USER_THRESHOLD (NAME, MAX_TEMPERATURE_THRESHOLD, MAX_HUMIDITY_THRESHOLD, MAX_LIGHT_INTENSITY_THRESHOLD, RFID_TAG_NUMBER) 
+        VALUES ('{name}', {max_temperature}, {max_humidity}, {max_light_intensity}, '{rfid_tag_number}')
     """
-    execute_query(conn, query)
+    execute_query(db_name, query)
 
 def delete_user_threshold(conn, user_id, threshold_id):
     query = f"""
@@ -39,11 +27,11 @@ def delete_user_threshold(conn, user_id, threshold_id):
     """
     execute_query(conn, query) 
 
-def select_user_threshold_by_rfid(conn, rfid_tag_number):
+def select_user_threshold_by_rfid(db_name, rfid_tag_number):
     query = f"""
         SELECT *
         FROM USER_THRESHOLD
         WHERE RFID_TAG_NUMBER = '{rfid_tag_number}'
     """
-    result = execute_query(conn, query)
-    return result.fetchall()
+    result = execute_query(db_name, query)
+    return result
