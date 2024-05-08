@@ -13,34 +13,28 @@ def execute_query(db_connection, query):
 get_db_connection("dashboard.db")
 execute_query(
     '''
-        CREATE TABLE USER(
-            USER_ID INT NOT NULL,
-            NAME TEXT NOT NULL,
-            CONSTRAINT USER_USERID_PK PRIMARY KEY(USER_ID)
-        );
-        CREATE TABLE THRESHOLD(
+        CREATE TABLE USER_THRESHOLD (
+            USER_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+            NAME VARCHAR NOT NULL,
             THRESHOLD_ID INT NOT NULL,
-            MAX_TEMPERATURE_THRESHOLD DECIMAL(3,1) NOT NULL,
-            MAX_HUMIDITY_THRESHOLD DECIMAL(3,1) NOT NULL,
+            MAX_TEMPERATURE_THRESHOLD DECIMAL NOT NULL,
+            MAX_HUMIDITY_THRESHOLD DECIMAL NOT NULL,
             MAX_LIGHT_INTENSITY_THRESHOLD INT NOT NULL,
-            USER_ID INT NOT NULL,
-            CONSTRAINT THRESHOLD_USERID_FK FOREIGN KEY REFERENCES
+            RFID_TAG_NUMBER TEXT
         );
     '''
 )
 
-def insert_user(conn, user_id, name):
-    query = f"INSERT INTO USER (USER_ID, NAME) VALUES ({user_id}, '{name}')"
+def insert_user_threshold(conn, user_id, name, threshold_id, max_temperature, max_humidity, max_light_intensity, rfid_tag_number):
+    query = f"""
+        INSERT INTO USER_THRESHOLD (USER_ID, NAME, THRESHOLD_ID, MAX_TEMPERATURE_THRESHOLD, MAX_HUMIDITY_THRESHOLD, MAX_LIGHT_INTENSITY_THRESHOLD, RFID_TAG_NUMBER) 
+        VALUES ({user_id}, '{name}', {threshold_id}, {max_temperature}, {max_humidity}, {max_light_intensity}, '{rfid_tag_number}')
+    """
     execute_query(conn, query)
 
-def insert_threshold(conn, threshold_id, max_temperature, max_humidity, max_light_intensity, user_id):
-    query = f"INSERT INTO THRESHOLD (THRESHOLD_ID, MAX_TEMPERATURE_THRESHOLD, MAX_HUMIDITY_THRESHOLD, MAX_LIGHT_INTENSITY_THRESHOLD, USER_ID) VALUES ({threshold_id}, {max_temperature}, {max_humidity}, {max_light_intensity}, {user_id})"
-    execute_query(conn, query)
-
-def delete_user(conn, user_id):
-    query = f"DELETE FROM USER WHERE USER_ID = {user_id}"
-    execute_query(conn, query)
-
-def delete_threshold(conn, threshold_id):
-    query = f"DELETE FROM THRESHOLD WHERE THRESHOLD_ID = {threshold_id}"
-    execute_query(conn, query)
+def delete_user_threshold(conn, user_id, threshold_id):
+    query = f"""
+        DELETE FROM USER_THRESHOLD 
+        WHERE USER_ID = {user_id} AND THRESHOLD_ID = {threshold_id}
+    """
+    execute_query(conn, query) 
