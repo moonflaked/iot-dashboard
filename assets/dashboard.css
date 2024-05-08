@@ -45,7 +45,7 @@ body {
 
 /*Color around cards*/
 .default-border-color {
-    border-color: #555555; 
+    border-color: #555555;
 }
 
 .card-title label {
@@ -69,7 +69,7 @@ body {
     margin-bottom: 1rem;
 }
 .card-container {
-    padding: 2rem 3.78rem;
+    padding: 1.8rem 3.78rem;
 }
 
 /*Margin between each card row*/
@@ -98,7 +98,7 @@ div.sc-iwsKbI{
     height: 31vh;
 }
 
-.inter-card-title {
+.inter-card-title, .inter-header-field {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-weight: normal;
@@ -112,13 +112,14 @@ div.sc-iwsKbI{
     font-style: normal;
 }
 
+
 .light-intensity-icon {
     padding: 1rem 0;
 }
 
 .light-intensity-icon img {
     max-height: 10vh;
-    
+   
 }
 
 .text-align-center {
@@ -142,4 +143,19 @@ div.sc-iwsKbI{
     right: 50%;
     transform: translate(50%, 0);
     top: 90%;
+}
+
+.header-field {
+    padding: 1.8rem 2.4rem;
+    font-size: 1.5rem;
+}
+
+.header-field-key {
+    color: #C2C2C2;
+}
+.header-field-rfid-id-value {
+    color: #FFFFFF;
+}
+.header-field-value {
+    color: #007bff;
 }

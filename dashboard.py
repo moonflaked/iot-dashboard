@@ -187,6 +187,63 @@ fan_status_card = dbc.Card(
                     className="border-0"
                 )
 
+profile_card = dbc.Card(
+                dbc.CardBody(
+                    [
+                        html.Div(
+                                html.H2(
+                                    "Profile"
+                                ),
+                                className="card-title default-border-color"
+                        ),
+                        html.Div(
+                            [
+                                html.Label("RFID ID #:",
+                                   
+                                    className="header-field-key"
+                                ),
+                                html.Span(
+                                    " aaaaaaa",
+                                    id="rfid-id",
+                                    className="header-field-rfid-id-value inter-header-field"
+                                ),
+                            ],
+                            className="header-field"
+                        ),
+                        html.Div(
+                            [
+                                html.Label("Favorite Temperature:",
+                                   
+                                    className="header-field-key"
+                                ),
+                                html.Span(
+                                    " aaaaaaa",
+                                    id="temperature-id",
+                                    className="header-field-value inter-header-field"
+                                ),
+                            ],
+                            className="header-field"
+                        ),
+                        html.Div(
+                            [
+                                html.Label("Favorite Light Intensity:",
+                                   
+                                    className="header-field-key"
+                                ),
+                                html.Span(
+                                    " aaaaaaa",
+                                    id="light-id",
+                                    className="header-field-value inter-header-field"
+                                ),
+                            ],
+                            className="header-field"
+                        ),
+                    ],
+                    className="card-body default-border-color"
+                ),
+                className="border-0"
+            )            
+
 email_sent_toast = dbc.Toast(
                         "An email has been sent!",
                         id="positioned-toast",
@@ -244,10 +301,10 @@ app.layout = dbc.Container(
                                     humidity_card,
                                     className="dashboard-card-right dashboard-card",
                                     width={"size":6}
-                                    
+                                   
                                 )
                             ],
-                            
+                           
                         ),
                         dbc.Row(
                             [
@@ -265,7 +322,7 @@ app.layout = dbc.Container(
                                         [
                                             light_status_card
                                         ],
-                                        
+                                       
                                     ),
                                     className="dashboard-card-right ",
                                     width=6
@@ -279,7 +336,7 @@ app.layout = dbc.Container(
                                         [
                                             fan_status_card
                                         ],
-                                        
+                                       
                                     ),
                                     className="dashboard-card-left",
                                     width=6
@@ -303,7 +360,7 @@ app.layout = dbc.Container(
                 dbc.Col(
                     html.Div(
                         [
-
+                            profile_card
                         ],
                        # className="dev-color-2"
                     ),
