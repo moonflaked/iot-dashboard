@@ -285,7 +285,7 @@ temperature_read_interval = dcc.Interval(
 
 mqtt_sub_interval = dcc.Interval(
     id="mqtt-sub-interval",
-    interval=5000,
+    interval=1000,
     n_intervals=0
 )
 
