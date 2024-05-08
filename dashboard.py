@@ -203,8 +203,22 @@ profile_card = dbc.Card(
                                     className="header-field-key"
                                 ),
                                 html.Span(
-                                    " aaaaaaa",
+                                    "",
                                     id="rfid-id",
+                                    className="header-field-rfid-id-value inter-header-field"
+                                ),
+                            ],
+                            className="header-field"
+                        ),
+                        html.Div(
+                            [
+                                html.Label("Name:",
+                                   
+                                    className="header-field-key"
+                                ),
+                                html.Span(
+                                    "",
+                                    id="name-id",
                                     className="header-field-rfid-id-value inter-header-field"
                                 ),
                             ],
@@ -217,7 +231,7 @@ profile_card = dbc.Card(
                                     className="header-field-key"
                                 ),
                                 html.Span(
-                                    " aaaaaaa",
+                                    "",
                                     id="temperature-id",
                                     className="header-field-value inter-header-field"
                                 ),
@@ -231,7 +245,7 @@ profile_card = dbc.Card(
                                     className="header-field-key"
                                 ),
                                 html.Span(
-                                    " aaaaaaa",
+                                    "",
                                     id="light-id",
                                     className="header-field-value inter-header-field"
                                 ),
@@ -258,7 +272,7 @@ email_sent_toast = dbc.Toast(
 
 humidity_read_interval = dcc.Interval(
     id="humidity-read-interval",
-    interval=15000,
+    interval=2000,
     n_intervals=0
 )
 
