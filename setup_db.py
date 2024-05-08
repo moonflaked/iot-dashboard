@@ -38,3 +38,12 @@ def delete_user_threshold(conn, user_id, threshold_id):
         WHERE USER_ID = {user_id} AND THRESHOLD_ID = {threshold_id}
     """
     execute_query(conn, query) 
+
+def select_user_threshold_by_rfid(conn, rfid_tag_number):
+    query = f"""
+        SELECT *
+        FROM USER_THRESHOLD
+        WHERE RFID_TAG_NUMBER = '{rfid_tag_number}'
+    """
+    result = execute_query(conn, query)
+    return result.fetchall()
