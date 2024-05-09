@@ -15,6 +15,7 @@ yes_response_received = False
 class EmailSentSelect(Enum):
     FAN_EMAIL_SEND = auto(),
     INTENSITY_EMAIL_SEND = auto()
+    RFID_EMAIL_SEND = auto()
 
 def send_email(email, password, text, sender_email, receiver_email, email_sent_type=EmailSentSelect.FAN_EMAIL_SEND):
     global email_sent
@@ -27,14 +28,19 @@ def send_email(email, password, text, sender_email, receiver_email, email_sent_t
         
         server.sendmail(sender_email, receiver_email, msg=text)
         server.quit()
-    elif(email_sent_type == EmailSentSelect.INTENSITY_EMAIL_SEND and email_sent_intensity == False): 
-        
+    elif(email_sent_type == EmailSentSelect.INTENSITY_EMAIL_SEND and email_sent_intensity == False):
         server = smtplib.SMTP("smtp.gmail.com", 587)
         server.starttls()
         
         server.login(email, password)
         server.sendmail(sender_email, receiver_email, msg=text)
-        print(text)
+        server.quit()
+    elif(email_sent_type == EmailSentSelect.RFID_EMAIL_SEND):
+        server = smtplib.SMTP("smtp.gmail.com", 587)
+        server.starttls()
+        
+        server.login(email, password)
+        server.sendmail(sender_email, receiver_email, msg=text)
         server.quit()
         
 

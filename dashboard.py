@@ -10,6 +10,7 @@ import dash_bootstrap_components as dbc
 import paho.mqtt.client as mqtt
 import mqtt_light_intensity as mli
 from datetime import datetime
+import mqtt_rfid as rfid
 motor.turn_off()
 
 app = Dash(__name__,
@@ -198,12 +199,12 @@ profile_card = dbc.Card(
                         ),
                         html.Div(
                             [
-                                html.Label("RFID ID #:",
+                                html.Label("RFID ID #: ",
                                    
                                     className="header-field-key"
                                 ),
                                 html.Span(
-                                    " aaaaaaa",
+                                    "",
                                     id="rfid-id",
                                     className="header-field-rfid-id-value inter-header-field"
                                 ),
@@ -212,12 +213,40 @@ profile_card = dbc.Card(
                         ),
                         html.Div(
                             [
-                                html.Label("Favorite Temperature:",
+                                html.Label("Name: ",
                                    
                                     className="header-field-key"
                                 ),
                                 html.Span(
-                                    " aaaaaaa",
+                                    "",
+                                    id="name-id",
+                                    className="header-field-rfid-id-value inter-header-field"
+                                ),
+                            ],
+                            className="header-field"
+                        ),
+                        html.Div(
+                            [
+                                html.Label("Favorite Humidity: ",
+                                   
+                                    className="header-field-key"
+                                ),
+                                html.Span(
+                                    "",
+                                    id="humidity-id",
+                                    className="header-field-value inter-header-field"
+                                ),
+                            ],
+                            className="header-field"
+                        ),
+                        html.Div(
+                            [
+                                html.Label("Favorite Temperature: ",
+                                   
+                                    className="header-field-key"
+                                ),
+                                html.Span(
+                                    "",
                                     id="temperature-id",
                                     className="header-field-value inter-header-field"
                                 ),
@@ -226,12 +255,12 @@ profile_card = dbc.Card(
                         ),
                         html.Div(
                             [
-                                html.Label("Favorite Light Intensity:",
+                                html.Label("Favorite Light Intensity: ",
                                    
                                     className="header-field-key"
                                 ),
                                 html.Span(
-                                    " aaaaaaa",
+                                    "",
                                     id="light-id",
                                     className="header-field-value inter-header-field"
                                 ),
@@ -258,7 +287,7 @@ email_sent_toast = dbc.Toast(
 
 humidity_read_interval = dcc.Interval(
     id="humidity-read-interval",
-    interval=15000,
+    interval=2000,
     n_intervals=0
 )
 
@@ -271,7 +300,13 @@ temperature_read_interval = dcc.Interval(
 
 mqtt_sub_interval = dcc.Interval(
     id="mqtt-sub-interval",
-    interval=5000,
+    interval=1000,
+    n_intervals=0
+)
+
+mqtt_sub_rfid_interval = dcc.Interval(
+    id="mqtt-sub-rfid-interval",
+    interval=1000,
     n_intervals=0
 )
 
@@ -374,7 +409,8 @@ app.layout = dbc.Container(
         email_sent_toast,
         temperature_read_interval,
         humidity_read_interval,
-        mqtt_sub_interval
+        mqtt_sub_interval,
+        mqtt_sub_rfid_interval
     ],
     className="g-0",
     fluid=True
@@ -415,63 +451,122 @@ def get_temperature(_):
     Input(component_id="temperature-gauge", component_property="value")
 )
 def check_temperature(sensor_temperature):
-    if(email_module.response_received == True and email_module.yes_response_received == False):
-        motor.turn_off()
-        email_module.response_received = False
-        return "assets/fan.png"
-    elif(email_module.response_received == True and email_module.yes_response_received == True):
-        motor.turn_on()
-        return "assets/fan-spin.png"
-    elif(sensor_temperature > 24):  
-        sender_email = 'loganluo288@gmail.com'
-        sender_password = 'criz nbpq zyrz ahjw'
-        receiver_email = "vladtivig@gmail.com"
-        receiver_password = "lkxc dvpr mrfb mroy"
-        temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Would you like to turn on the fan?"
-        email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
-        
-        email_module.email_sent = True
-        message_response = email_module.receive_email(sender_email, sender_password)
-        if(email_module.email_sent and message_response != None):
-            if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
-                motor.turn_on()
-                email_module.response_received = True
-                email_module.yes_response_received = True
-                email_module.email_sent = False
-                return "assets/fan-spin.png"
-            elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
-                motor.turn_off()
-                email_module.response_received = True
-                email_module.yes_response_received = False
-                email_module.email_sent = False
-                return "assets/fan.png"
-        else:
+    if(rfid.light_intensity_threshold == None):
+        if(email_module.response_received == True and email_module.yes_response_received == False):
             motor.turn_off()
+            email_module.response_received = False
             return "assets/fan.png"
-    elif(sensor_temperature <= 24 and email_module.email_sent == True):
-        sender_email = 'loganluo288@gmail.com'
-        sender_password = 'criz nbpq zyrz ahjw'
-        receiver_email = "vladtivig@gmail.com"
-        message_response = email_module.receive_email(sender_email, sender_password)
-        if(message_response != None):
-            if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
-                motor.turn_on()
-                email_module.response_received = True
-                email_module.yes_response_received = True
-                email_module.email_sent = False
-                return "assets/fan-spin.png"
-            elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+        elif(email_module.response_received == True and email_module.yes_response_received == True):
+            motor.turn_on()
+            return "assets/fan-spin.png"
+        elif(sensor_temperature > 24):  
+            sender_email = 'loganluo288@gmail.com'
+            sender_password = 'criz nbpq zyrz ahjw'
+            receiver_email = "vladtivig@gmail.com"
+            receiver_password = "lkxc dvpr mrfb mroy"
+            temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Would you like to turn on the fan?"
+            email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
+            
+            email_module.email_sent = True
+            message_response = email_module.receive_email(sender_email, sender_password)
+            if(email_module.email_sent and message_response != None):
+                if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_on()
+                    email_module.response_received = True
+                    email_module.yes_response_received = True
+                    email_module.email_sent = False
+                    return "assets/fan-spin.png"
+                elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_off()
+                    email_module.response_received = True
+                    email_module.yes_response_received = False
+                    email_module.email_sent = False
+                    return "assets/fan.png"
+            else:
                 motor.turn_off()
-                email_module.response_received = True
-                email_module.yes_response_received = False
-                email_module.email_sent = False
+                return "assets/fan.png"
+        elif(sensor_temperature <= 24 and email_module.email_sent == True):
+            sender_email = 'loganluo288@gmail.com'
+            sender_password = 'criz nbpq zyrz ahjw'
+            receiver_email = "vladtivig@gmail.com"
+            message_response = email_module.receive_email(sender_email, sender_password)
+            if(message_response != None):
+                if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_on()
+                    email_module.response_received = True
+                    email_module.yes_response_received = True
+                    email_module.email_sent = False
+                    return "assets/fan-spin.png"
+                elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_off()
+                    email_module.response_received = True
+                    email_module.yes_response_received = False
+                    email_module.email_sent = False
+                    return "assets/fan.png"
+            else:
+                motor.turn_off()
                 return "assets/fan.png"
         else:
             motor.turn_off()
             return "assets/fan.png"
     else:
-        motor.turn_off()
-        return "assets/fan.png"
+        if(email_module.response_received == True and email_module.yes_response_received == False):
+            motor.turn_off()
+            email_module.response_received = False
+            return "assets/fan.png"
+        elif(email_module.response_received == True and email_module.yes_response_received == True):
+            motor.turn_on()
+            return "assets/fan-spin.png"
+        elif(sensor_temperature > rfid.temperature_threshold):  
+            sender_email = 'loganluo288@gmail.com'
+            sender_password = 'criz nbpq zyrz ahjw'
+            receiver_email = "vladtivig@gmail.com"
+            receiver_password = "lkxc dvpr mrfb mroy"
+            temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Would you like to turn on the fan?"
+            email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
+            
+            email_module.email_sent = True
+            message_response = email_module.receive_email(sender_email, sender_password)
+            if(email_module.email_sent and message_response != None):
+                if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_on()
+                    email_module.response_received = True
+                    email_module.yes_response_received = True
+                    email_module.email_sent = False
+                    return "assets/fan-spin.png"
+                elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_off()
+                    email_module.response_received = True
+                    email_module.yes_response_received = False
+                    email_module.email_sent = False
+                    return "assets/fan.png"
+            else:
+                motor.turn_off()
+                return "assets/fan.png"
+        elif(sensor_temperature <= rfid.temperature_threshold and email_module.email_sent == True):
+            sender_email = 'loganluo288@gmail.com'
+            sender_password = 'criz nbpq zyrz ahjw'
+            receiver_email = "vladtivig@gmail.com"
+            message_response = email_module.receive_email(sender_email, sender_password)
+            if(message_response != None):
+                if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_on()
+                    email_module.response_received = True
+                    email_module.yes_response_received = True
+                    email_module.email_sent = False
+                    return "assets/fan-spin.png"
+                elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
+                    motor.turn_off()
+                    email_module.response_received = True
+                    email_module.yes_response_received = False
+                    email_module.email_sent = False
+                    return "assets/fan.png"
+            else:
+                motor.turn_off()
+                return "assets/fan.png"
+        else:
+            motor.turn_off()
+            return "assets/fan.png"
 
 @callback(
     Output(component_id="humidity-gauge", component_property="value"),
@@ -499,25 +594,72 @@ def update_light_intensity(_):
         # Because we only want to updte when there is data
         raise PreventUpdate
     else:
-        if(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == False):
-            sender_email = 'loganluo288@gmail.com'
-            sender_password = 'criz nbpq zyrz ahjw'
-            receiver_email = "vladtivig@gmail.com"
-            receiver_password = "lkxc dvpr mrfb mroy"
-            current_time = datetime.now().strftime("%H:%M:%S")
-            
-            text = f"\nThe Light is ON at {current_time}."
-            email_module.send_email(sender_email, sender_password, text, sender_email, receiver_email, email_module.EmailSentSelect.INTENSITY_EMAIL_SEND)
-            email_module.email_sent_intensity = True
-            light.turn_on()
-            return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", True
-        elif(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == True):
-            return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", no_update
-        return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
+        if(rfid.rfid_tag == ""):
+            if(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == False):
+                sender_email = 'loganluo288@gmail.com'
+                sender_password = 'criz nbpq zyrz ahjw'
+                receiver_email = "vladtivig@gmail.com"
+                receiver_password = "lkxc dvpr mrfb mroy"
+                current_time = datetime.now().strftime("%H:%M:%S")
+                
+                text = f"\nThe Light is ON at {current_time}."
+                email_module.send_email(sender_email, sender_password, text, sender_email, receiver_email, email_module.EmailSentSelect.INTENSITY_EMAIL_SEND)
+                email_module.email_sent_intensity = True
+                light.turn_on()
+                return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", True
+            elif(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == True):
+                return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", no_update
+            return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
+        else:
+            if(int(mli.curr_light_intensity) < rfid.light_intensity_threshold and email_module.email_sent_intensity == False):
+                sender_email = 'loganluo288@gmail.com'
+                sender_password = 'criz nbpq zyrz ahjw'
+                receiver_email = "vladtivig@gmail.com"
+                receiver_password = "lkxc dvpr mrfb mroy"
+                current_time = datetime.now().strftime("%H:%M:%S")
+                
+                text = f"\nThe Light is ON at {current_time}."
+                email_module.send_email(sender_email, sender_password, text, sender_email, receiver_email, email_module.EmailSentSelect.INTENSITY_EMAIL_SEND)
+                email_module.email_sent_intensity = True
+                light.turn_on()
+                return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", True
+            elif(int(mli.curr_light_intensity) < rfid.light_intensity_threshold and email_module.email_sent_intensity == True):
+                return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", no_update
+            return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
 
+current_rfid_data = ""
+@callback(
+    [
+        Output(component_id="rfid-id", component_property="children"),
+        Output(component_id="name-id", component_property="children"),
+        Output(component_id="temperature-id", component_property="children"),                                           
+        Output(component_id="humidity-id", component_property="children"),
+        Output(component_id="light-id", component_property="children"),
+        Input(component_id="mqtt-sub-rfid-interval", component_property="n_intervals")
+    ]
+)
+def update_profile_card(_):
+    global current_rfid_data
+    print(current_rfid_data)
+    print(rfid.rfid_tag)
+    if(
+        rfid.rfid_tag != ""
+        and rfid.name != ""
+    ):
+        sender_email = 'loganluo288@gmail.com'
+        sender_password = 'criz nbpq zyrz ahjw'
+        receiver_email = "vladtivig@gmail.com"
+        receiver_password = "lkxc dvpr mrfb mroy"
+        current_time = datetime.now().strftime("%H:%M:%S")
+        
 
-
-
+        if(current_rfid_data != rfid.rfid_tag):
+            current_rfid_data = rfid.rfid_tag
+            email_module.send_email(sender_email, sender_password, f"\nUser {rfid.name} entered at {current_time}", sender_email, receiver_email, email_module.EmailSentSelect.RFID_EMAIL_SEND)
+        return rfid.rfid_tag, rfid.name, rfid.temperature_threshold, rfid.humidity_threshold, rfid.light_intensity_threshold
+    else:
+        raise PreventUpdate
+    
 if __name__ == '__main__':
     app.run(debug=True)
     

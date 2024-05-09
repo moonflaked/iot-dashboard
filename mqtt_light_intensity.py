@@ -14,11 +14,10 @@ def on_message(client, userdata, msg):
     global curr_light_intensity
     curr_light_intensity = str(int(msg.payload))
 
-
 mqttc.on_connect = on_connect
 mqttc.on_message = on_message
 
-mqttc.connect("localhost", 1883, 60)
+mqttc.connect("172.20.10.2", 1883, 60)
 
 
 mqttc.loop_start()
