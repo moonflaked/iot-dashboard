@@ -609,6 +609,10 @@ def update_light_intensity(_):
                 return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", True
             elif(int(mli.curr_light_intensity) < 400 and email_module.email_sent_intensity == True):
                 return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", no_update
+            elif(int(mli.curr_light_intensity) > 400):
+                       email_module.email_sent_intensity = False
+                       light.turn_off()
+                       return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
             return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
         else:
             if(int(mli.curr_light_intensity) < rfid.light_intensity_threshold and email_module.email_sent_intensity == False):
@@ -625,6 +629,10 @@ def update_light_intensity(_):
                 return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", True
             elif(int(mli.curr_light_intensity) < rfid.light_intensity_threshold and email_module.email_sent_intensity == True):
                 return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/open-light.png", no_update
+            elif(int(mli.curr_light_intensity) > 400):
+                       email_module.email_sent_intensity = False
+                       light.turn_off()
+                       return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
             return int(mli.curr_light_intensity), mli.curr_light_intensity, "assets/closed-light.png", no_update
 
 current_rfid_data = ""
