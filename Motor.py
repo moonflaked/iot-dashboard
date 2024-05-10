@@ -27,8 +27,8 @@ def turn_off():
     GPIO.output(Motor1, GPIO.LOW)
 
 # time.sleep(5)
-#GPIO.cleanup()
-turn_on();
+# GPIO.cleanup()
+# turn_on();
 # GPIO.setup(Motor1, GPIO.OUT)
 # GPIO.setup(Motor2, GPIO.OUT)
 # GPIO.setup(Motor3, GPIO.OUT)

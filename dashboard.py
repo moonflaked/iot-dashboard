@@ -451,65 +451,8 @@ def get_temperature(_):
     Input(component_id="temperature-gauge", component_property="value")
 )
 def check_temperature(sensor_temperature):
-    if(rfid.light_intensity_threshold == None):
-        if(email_module.response_received == True and email_module.yes_response_received == False):
-            motor.turn_off()
-            email_module.response_received = False
-            return "assets/fan.png"
-        elif(email_module.response_received == True and email_module.yes_response_received == True):
-            motor.turn_on()
-            return "assets/fan-spin.png"
-        elif(sensor_temperature > 24):  
-            sender_email = 'loganluo288@gmail.com'
-            sender_password = 'criz nbpq zyrz ahjw'
-            receiver_email = "vladtivig@gmail.com"
-            receiver_password = "lkxc dvpr mrfb mroy"
-            temperature_exceeded_message = f"The current temperature is {sensor_temperature}. Would you like to turn on the fan?"
-            email_module.send_email(sender_email, sender_password, temperature_exceeded_message, sender_email, receiver_email)
-            
-            email_module.email_sent = True
-            message_response = email_module.receive_email(sender_email, sender_password)
-            if(email_module.email_sent and message_response != None):
-                if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
-                    motor.turn_on()
-                    email_module.response_received = True
-                    email_module.yes_response_received = True
-                    email_module.email_sent = False
-                    return "assets/fan-spin.png"
-                elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
-                    motor.turn_off()
-                    email_module.response_received = True
-                    email_module.yes_response_received = False
-                    email_module.email_sent = False
-                    return "assets/fan.png"
-            else:
-                motor.turn_off()
-                return "assets/fan.png"
-        elif(sensor_temperature <= 24 and email_module.email_sent == True):
-            sender_email = 'loganluo288@gmail.com'
-            sender_password = 'criz nbpq zyrz ahjw'
-            receiver_email = "vladtivig@gmail.com"
-            message_response = email_module.receive_email(sender_email, sender_password)
-            if(message_response != None):
-                if("yes" in message_response.split()[0].lower() and email_module.response_received == False):
-                    motor.turn_on()
-                    email_module.response_received = True
-                    email_module.yes_response_received = True
-                    email_module.email_sent = False
-                    return "assets/fan-spin.png"
-                elif("yes" not in message_response.split()[0].lower() and email_module.response_received == False):
-                    motor.turn_off()
-                    email_module.response_received = True
-                    email_module.yes_response_received = False
-                    email_module.email_sent = False
-                    return "assets/fan.png"
-            else:
-                motor.turn_off()
-                return "assets/fan.png"
-        else:
-            motor.turn_off()
-            return "assets/fan.png"
-    else:
+    print(rfid.temperature_threshold)
+    if(rfid.rfid_tag != None):
         if(email_module.response_received == True and email_module.yes_response_received == False):
             motor.turn_off()
             email_module.response_received = False
@@ -567,6 +510,8 @@ def check_temperature(sensor_temperature):
         else:
             motor.turn_off()
             return "assets/fan.png"
+    else:
+        raise PreventUpdate
 
 @callback(
     Output(component_id="humidity-gauge", component_property="value"),
@@ -648,8 +593,6 @@ current_rfid_data = ""
 )
 def update_profile_card(_):
     global current_rfid_data
-    print(current_rfid_data)
-    print(rfid.rfid_tag)
     if(
         rfid.rfid_tag != ""
         and rfid.name != ""
